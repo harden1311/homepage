@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的主页</title>
+<style>
+  :root {
+    --blue-50:  #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --blue-900: #1e3a5f;
+    --white:    #ffffff;
+    --slate-50: #f8fafc;
+    --slate-100:#f1f5f9;
+    --slate-300:#cbd5e1;
+    --slate-400:#94a3b8;
+    --slate-500:#64748b;
+    --slate-700:#334155;
+    --slate-800:#1e293b;
+    --red-400: #f87171;
+    --red-500: #ef4444;
+    --radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    min-height: 100vh;
+    background: var(--blue-900) center/cover no-repeat fixed;
+    /* 替换为你的南昌大学校门图片路径 */
+    background-image: url('ncu-gate.png');
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(30,58,95,0.75) 0%, rgba(59,130,246,0.35) 100%);
+    z-index: 0;
+  }
+
+  .main {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  /* ---- 时间 ---- */
+  .time-block {
+    text-align: center;
+  }
+  .time-block .clock {
+    font-size: 3.75rem;
+    font-weight: 300;
+    letter-spacing: 6px;
+    color: var(--white);
+    text-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  }
+  .time-block .date {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.75);
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* ---- 一言 ---- */
+  .quote {
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.9);
+    font-style: italic;
+    letter-spacing: 1px;
+    text-align: center;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.2);
+    cursor: text;
+    transition: opacity 0.3s;
+    outline: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    min-width: 200px;
+  }
+  .quote:hover { border-color: rgba(255,255,255,0.2); }
+  .quote:focus { border-color: rgba(255,255,255,0.4); font-style: normal; }
+
+  /* ---- 卡片容器 ---- */
+  .card-row {
+    width: 100%;
+    display: flex;
+    gap: 1.5rem;
+  }
+  .card-row .card {
+    flex: 1;
+    min-width: 0;
+  }
+  .card {
+    width: 100%;
+    background: transparent;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: none;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  /* ---- 搜索 ---- */
+  .search-row {
+    display: flex;
+    align-items: center;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 50px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .search-row:focus-within { border-color: rgba(255,255,255,0.5); }
+  .search-row input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    padding: 0.8rem 1.25rem;
+    font-size: 1rem;
+    outline: none;
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+    font-family: inherit;
+  }
+  .search-row input::placeholder { color: rgba(255,255,255,0.4); }
+  .search-row button {
+    border: none;
+    padding: 0 1.25rem;
+    align-self: stretch;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+  }
+  .search-row button:hover { background: rgba(255,255,255,0.15); }
+
+  .engine-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .engine-row button {
+    padding: 0.3rem 0.85rem;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.8rem;
+    cursor: grab;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .engine-row button:active { cursor: grabbing; }
+  .engine-row button.dragging { opacity: 0.4; }
+  .engine-row button.drag-over { border-color: rgba(255,255,255,0.7); }
+  .engine-row button.active {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+    color: #fff;
+  }
+  .engine-row button:hover:not(.active) {
+    border-color: rgba(255,255,255,0.5);
+    color: #fff;
+  }
+
+  /* ---- 书签 ---- */
+  .section-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 1rem;
+  }
+  .bookmarks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.6rem;
+  }
+  .bm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.75rem 0.4rem;
+    border-radius: 12px;
+    cursor: grab;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s, opacity 0.2s;
+    position: relative;
+  }
+  .bm:active { cursor: grabbing; }
+  .bm.dragging { opacity: 0.4; }
+  .bm.drag-over { background: rgba(255,255,255,0.12); }
+  .bm:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
+  .bm .icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .bm .icon img { width: 100%; height: 100%; object-fit: cover; }
+  .bm .icon span {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+  }
+  .bm .name {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    word-break: break-all;
+    line-height: 1.2;
+  }
+  .bm .del {
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(239,68,68,0.85);
+    color: #fff;
+    font-size: 0.65rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .bm:hover .del { display: flex; }
+  .add-bm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.75rem 0.4rem;
+    border-radius: 12px;
+    cursor: pointer;
+    background: none;
+    border: 1px dashed rgba(255,255,255,0.2);
+    font-family: inherit;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.4);
+    transition: all 0.2s;
+  }
+  .add-bm:hover { border-color: rgba(255,255,255,0.5); color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.05); }
+  .add-bm .plus { font-size: 1.5rem; font-weight: 300; }
+
+  /* ---- 待办 ---- */
+  .todo-input-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .todo-input-row input {
+    flex: 1;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 50px;
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+    outline: none;
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .todo-input-row input:focus { border-color: rgba(255,255,255,0.6); }
+  .todo-input-row input::placeholder { color: rgba(255,255,255,0.35); }
+  .todo-input-row button {
+    padding: 0.65rem 1.25rem;
+    border-radius: 50px;
+    border: none;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .todo-input-row button:hover { background: rgba(255,255,255,0.25); }
+
+  .todo-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+  .todo-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+    transition: background 0.2s;
+    cursor: grab;
+  }
+  .todo-list li:active { cursor: grabbing; }
+  .todo-list li.drag-over { background: rgba(255,255,255,0.1); }
+  .todo-list li.dragging { opacity: 0.4; }
+  .todo-list li:hover { background: rgba(255,255,255,0.05); }
+  .todo-list li.done .text { text-decoration: line-through; color: rgba(255,255,255,0.3); }
+  .todo-list .check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.3);
+    flex-shrink: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: none;
+    padding: 0;
+  }
+  .todo-list .check:hover { border-color: rgba(255,255,255,0.6); }
+  .todo-list li.done .check {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.3);
+  }
+  .todo-list li.done .check::after {
+    content: '✓';
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+  }
+  .todo-list .text {
+    flex: 1;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.8);
+  }
+  .todo-list .rm {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.3);
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+  }
+  .todo-list li:hover .rm { display: flex; }
+  .todo-list .rm:hover { color: var(--red-400); }
+
+  /* ---- 弹窗 ---- */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .overlay.show { display: flex; }
+  .dialog {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .dialog h3 { font-size: 1rem; color: var(--slate-800); margin-bottom: 1rem; }
+  .dialog input {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 2px solid var(--blue-200);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    outline: none;
+    margin-bottom: 0.75rem;
+    color: var(--slate-800);
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .dialog input:focus { border-color: var(--blue-500); }
+  .dialog .btns { display: flex; gap: 0.6rem; }
+  .dialog .btns button {
+    flex: 1;
+    padding: 0.6rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: opacity 0.2s;
+  }
+  .dialog .btns button:hover { opacity: 0.85; }
+  .btn-save { background: var(--blue-500); color: #fff; }
+  .btn-cancel { background: var(--slate-100); color: var(--slate-700); }
+
+  @media (max-width: 600px) {
+    body { padding: 1rem; }
+    .time-block .clock { font-size: 2.5rem; letter-spacing: 3px; }
+    .card { padding: 1rem; }
+    .card-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="main">
+  <div class="time-block">
+    <div class="clock" id="clock">00:00</div>
+    <div class="date" id="date"></div>
+  </div>
+
+  <div class="quote" id="quote" contenteditable="true" title="点击修改">轻舟已过万重山</div>
+
+  <div class="card">
+    <div class="search-row">
+      <input id="searchInput" placeholder="搜索" autofocus>
+      <button id="searchBtn">&#x1F50D;</button>
+    </div>
+    <div class="engine-row" id="engines"></div>
+  </div>
+
+  <div class="card-row">
+    <div class="card" id="bmCard">
+      <div class="section-title">常用网站</div>
+      <div class="bookmarks-grid" id="bmGrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">待办事项</div>
+      <div class="todo-input-row">
+        <input id="todoInput" placeholder="添加新任务...">
+      <button id="todoAdd">添加</button>
+    </div>
+    <ul class="todo-list" id="todoList"></ul>
+  </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="dialog">
+    <h3>添加快捷方式</h3>
+    <input id="dlgName" placeholder="网站名称">
+    <input id="dlgUrl" placeholder="网址 (https://...)" type="url">
+    <div class="btns">
+      <button class="btn-cancel" id="dlgCancel">取消</button>
+      <button class="btn-save" id="dlgSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== 数据 ==========
+const DEFAULT_BM = [
+  { n:'GitHub',   u:'https://github.com' },
+  { n:'Bilibili', u:'https://www.bilibili.com' },
+  { n:'YouTube',  u:'https://www.youtube.com' },
+  { n:'知乎',     u:'https://www.zhihu.com' },
+  { n:'掘金',     u:'https://juejin.cn' },
+  { n:'Gmail',    u:'https://mail.google.com' },
+  { n:'微博',     u:'https://weibo.com' },
+  { n:'V2EX',     u:'https://www.v2ex.com' },
+];
+
+let bm = load('bm') || [...DEFAULT_BM];
+let todos = load('todos') || [];
+
+function load(k) { try { return JSON.parse(localStorage.getItem('hp_'+k)); } catch(_) { return null; } }
+function save(k, v) { localStorage.setItem('hp_'+k, JSON.stringify(v)); }
+
+// ========== 时钟 ==========
+function tick() {
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+  const ds = ['日','一','二','三','四','五','六'];
+  document.getElementById('date').textContent =
+    n.getFullYear()+'年'+(n.getMonth()+1)+'月'+n.getDate()+'日 星期'+ds[n.getDay()];
+}
+tick(); setInterval(tick, 1000);
+
+// ========== 一言 ==========
+const qe = document.getElementById('quote');
+const savedQuote = localStorage.getItem('hp_quote');
+if (savedQuote !== null) qe.textContent = savedQuote;
+qe.addEventListener('blur', () => {
+  const v = qe.textContent.trim();
+  if (v) localStorage.setItem('hp_quote', v);
+});
+
+// ========== 搜索 ==========
+const DEFAULT_ENGINES = [
+  { n:'Google', u:'https://www.google.com/search?q=' },
+  { n:'百度',   u:'https://www.baidu.com/s?wd=' },
+  { n:'Bing',   u:'https://www.bing.com/search?q=' },
+  { n:'B站',    u:'https://search.bilibili.com/all?keyword=' },
+  { n:'知乎',   u:'https://www.zhihu.com/search?type=content&q=' },
+];
+let engines = load('engines') || [...DEFAULT_ENGINES];
+let activeEng = 0;
+
+function getEngine() { return engines[activeEng].u; }
+
+function renderEngines() {
+  const row = document.getElementById('engines');
+  row.innerHTML = engines.map((e,i) =>
+    `<button draggable="true" data-i="${i}" data-u="${e.u}" class="${i===activeEng?'active':''}">${e.n}</button>`
+  ).join('');
+
+  let dragIdx = -1;
+  row.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      activeEng = +b.dataset.i;
+      document.querySelectorAll('#engines button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+    });
+    b.addEventListener('dragstart', e => {
+      dragIdx = +b.dataset.i;
+      b.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    b.addEventListener('dragend', () => {
+      b.classList.remove('dragging');
+      row.querySelectorAll('button').forEach(x=>x.classList.remove('drag-over'));
+      renderEngines();
+    });
+    b.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (+b.dataset.i !== dragIdx) b.classList.add('drag-over');
+    });
+    b.addEventListener('dragleave', () => b.classList.remove('drag-over'));
+    b.addEventListener('drop', e => {
+      e.preventDefault();
+      b.classList.remove('drag-over');
+      const to = +b.dataset.i;
+      if (dragIdx >= 0 && dragIdx !== to) {
+        const activeUrl = engines[activeEng].u;
+        const item = engines.splice(dragIdx, 1)[0];
+        engines.splice(to, 0, item);
+        activeEng = engines.findIndex(e => e.u === activeUrl);
+        save('engines', engines);
+        renderEngines();
+      }
+    });
+  });
+}
+
+const si = document.getElementById('searchInput');
+document.getElementById('searchBtn').addEventListener('click', () => {
+  const q = si.value.trim();
+  if (q) window.location.href = getEngine() + encodeURIComponent(q);
+});
+si.addEventListener('keydown', e => { if (e.key==='Enter') document.getElementById('searchBtn').click(); });
+
+renderEngines();
+
+// ========== 书签 ==========
+function icon(name) {
+  return '<span>'+name.charAt(0).toUpperCase()+'</span>';
+}
+function renderBM() {
+  const g = document.getElementById('bmGrid');
+  g.innerHTML = bm.map((x,i) => `
+    <a class="bm" href="${x.u}" target="_blank" title="${x.n}" draggable="true" data-i="${i}">
+      <div class="icon">${icon(x.n)}</div>
+      <span class="name">${x.n}</span>
+      <button class="del" data-i="${i}">&times;</button>
+    </a>
+  `).join('') + `
+    <button class="add-bm" id="addBmBtn"><span class="plus">+</span>添加</button>
+  `;
+  g.querySelectorAll('.del').forEach(b => {
+    b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation();
+      bm.splice(+b.dataset.i,1); save('bm',bm); renderBM(); });
+  });
+  g.querySelector('#addBmBtn').addEventListener('click', openDlg);
+
+  // 拖拽排序
+  let dragIdx = -1;
+  g.querySelectorAll('.bm').forEach(el => {
+    el.addEventListener('dragstart', e => {
+      dragIdx = +el.dataset.i;
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      g.querySelectorAll('.bm').forEach(l => l.classList.remove('drag-over'));
+    });
+    el.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (+el.dataset.i !== dragIdx) el.classList.add('drag-over');
+    });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      el.classList.remove('drag-over');
+      const to = +el.dataset.i;
+      if (dragIdx >= 0 && dragIdx !== to) {
+        const item = bm.splice(dragIdx, 1)[0];
+        bm.splice(to, 0, item);
+        save('bm', bm);
+        renderBM();
+      }
+    });
+  });
+}
+function openDlg() {
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('dlgName').focus();
+}
+function closeDlg() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('dlgName').value = '';
+  document.getElementById('dlgUrl').value = '';
+}
+document.getElementById('dlgCancel').addEventListener('click', closeDlg);
+document.getElementById('overlay').addEventListener('click', e => { if (e.target===e.currentTarget) closeDlg(); });
+document.getElementById('dlgSave').addEventListener('click', () => {
+  const n = document.getElementById('dlgName').value.trim();
+  let u = document.getElementById('dlgUrl').value.trim();
+  if (!n||!u) return;
+  if (!/^https?:\/\//i.test(u)) u = 'https://'+u;
+  bm.push({n,u}); save('bm',bm); renderBM(); closeDlg();
+});
+document.getElementById('dlgName').addEventListener('keydown', e => {
+  if (e.key==='Enter') document.getElementById('dlgUrl').focus();
+});
+document.getElementById('dlgUrl').addEventListener('keydown', e => {
+  if (e.key==='Enter') document.getElementById('dlgSave').click();
+});
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeDlg(); });
+renderBM();
+
+// ========== 待办 ==========
+function renderTodos() {
+  const ul = document.getElementById('todoList');
+  ul.innerHTML = todos.map((t,i) => `
+    <li class="${t.done?'done':''}" draggable="true" data-i="${i}">
+      <button class="check" data-i="${i}"></button>
+      <span class="text">${t.txt}</span>
+      <button class="rm" data-i="${i}">&times;</button>
+    </li>
+  `).join('');
+
+  ul.querySelectorAll('.check').forEach(b => {
+    b.addEventListener('click', () => { todos[+b.dataset.i].done=!todos[+b.dataset.i].done; save('todos',todos); renderTodos(); });
+  });
+  ul.querySelectorAll('.rm').forEach(b => {
+    b.addEventListener('click', () => { todos.splice(+b.dataset.i,1); save('todos',todos); renderTodos(); });
+  });
+
+  // 拖拽排序
+  let dragIdx = -1;
+  ul.querySelectorAll('li').forEach(li => {
+    li.addEventListener('dragstart', e => {
+      dragIdx = +li.dataset.i;
+      li.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    li.addEventListener('dragend', () => {
+      li.classList.remove('dragging');
+      ul.querySelectorAll('li').forEach(l => l.classList.remove('drag-over'));
+    });
+    li.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (+li.dataset.i !== dragIdx) li.classList.add('drag-over');
+    });
+    li.addEventListener('dragleave', () => li.classList.remove('drag-over'));
+    li.addEventListener('drop', e => {
+      e.preventDefault();
+      li.classList.remove('drag-over');
+      const to = +li.dataset.i;
+      if (dragIdx >= 0 && dragIdx !== to) {
+        const item = todos.splice(dragIdx, 1)[0];
+        todos.splice(to, 0, item);
+        save('todos', todos);
+        renderTodos();
+      }
+    });
+  });
+}
+function addTodo() {
+  const v = document.getElementById('todoInput').value.trim();
+  if (!v) return;
+  todos.unshift({txt:v, done:false});
+  save('todos',todos);
+  renderTodos();
+  document.getElementById('todoInput').value = '';
+}
+document.getElementById('todoAdd').addEventListener('click', addTodo);
+document.getElementById('todoInput').addEventListener('keydown', e => { if (e.key==='Enter') addTodo(); });
+renderTodos();
+</script>
+</body>
+</html>
