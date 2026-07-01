@@ -413,6 +413,55 @@
   .btn-save { background: var(--blue-500); color: #fff; }
   .btn-cancel { background: var(--slate-100); color: var(--slate-700); }
 
+  /* ---- 换壁纸 ---- */
+  .wp-btn {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    backdrop-filter: blur(8px);
+  }
+  .wp-btn:hover {
+    border-color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.12);
+  }
+  .wp-reset {
+    position: fixed;
+    top: 1rem;
+    right: 3rem;
+    z-index: 10;
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.35);
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-family: inherit;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s;
+    display: none;
+  }
+  .wp-reset.show { display: block; }
+  .wp-reset:hover {
+    border-color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.8);
+  }
+  #wpInput { display: none; }
+
   @media (max-width: 600px) {
     body { padding: 1rem; }
     .time-block .clock { font-size: 2.5rem; letter-spacing: 3px; }
@@ -422,6 +471,10 @@
 </style>
 </head>
 <body>
+
+<button class="wp-btn" id="wpBtn" title="更换壁纸">&#x1F5BC;</button>
+<button class="wp-reset" id="wpReset" title="恢复默认壁纸">恢复默认</button>
+<input type="file" id="wpInput" accept="image/*">
 
 <div class="main">
   <div class="time-block">
@@ -573,6 +626,43 @@ document.getElementById('searchBtn').addEventListener('click', () => {
 si.addEventListener('keydown', e => { if (e.key==='Enter') document.getElementById('searchBtn').click(); });
 
 renderEngines();
+
+// ========== 壁纸 ==========
+const body = document.body;
+const wpInput = document.getElementById('wpInput');
+const wpBtn = document.getElementById('wpBtn');
+const wpReset = document.getElementById('wpReset');
+const DEFAULT_BG = "url('ncu-gate.png')";
+
+(function loadWallpaper() {
+  const saved = localStorage.getItem('hp_wallpaper');
+  if (saved) {
+    body.style.backgroundImage = 'url(' + saved + ')';
+    wpReset.classList.add('show');
+  }
+})();
+
+wpBtn.addEventListener('click', () => wpInput.click());
+
+wpInput.addEventListener('change', () => {
+  const file = wpInput.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const dataUrl = reader.result;
+    body.style.backgroundImage = 'url(' + dataUrl + ')';
+    localStorage.setItem('hp_wallpaper', dataUrl);
+    wpReset.classList.add('show');
+  };
+  reader.readAsDataURL(file);
+  wpInput.value = '';
+});
+
+wpReset.addEventListener('click', () => {
+  localStorage.removeItem('hp_wallpaper');
+  body.style.backgroundImage = DEFAULT_BG;
+  wpReset.classList.remove('show');
+});
 
 // ========== 书签 ==========
 function icon(name) {
