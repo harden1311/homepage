@@ -185,12 +185,40 @@
   }
 
   /* ---- 书签 ---- */
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
   .section-title {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 2px;
     color: rgba(255,255,255,0.55);
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+  }
+  .add-bm-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-family: inherit;
+    line-height: 1;
+    padding: 0;
+  }
+  .add-bm-btn:hover {
+    border-color: rgba(255,255,255,0.5);
+    color: #fff;
+    background: rgba(255,255,255,0.12);
   }
   .bookmarks-grid {
     display: grid;
@@ -571,7 +599,10 @@
 
   <div class="card-row">
     <div class="card" id="bmCard">
-      <div class="section-title">常用网站</div>
+      <div class="card-header">
+        <div class="section-title">常用网站</div>
+        <button class="add-bm-btn" id="addBmBtn" title="添加网站">+</button>
+      </div>
       <div class="bookmarks-grid" id="bmGrid"></div>
     </div>
 
@@ -797,14 +828,11 @@ function renderBM() {
       <span class="name">${x.n}</span>
       <button class="del" data-i="${i}">&times;</button>
     </a>
-  `).join('') + `
-    <button class="add-bm" id="addBmBtn"><span class="plus">+</span>添加</button>
-  `;
+  `).join('');
   g.querySelectorAll('.del').forEach(b => {
     b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation();
       bm.splice(+b.dataset.i,1); save('bm',bm); renderBM(); });
   });
-  g.querySelector('#addBmBtn').addEventListener('click', openDlg);
 
   // 拖拽排序
   let dragIdx = -1;
@@ -864,6 +892,7 @@ document.getElementById('dlgUrl').addEventListener('keydown', e => {
 });
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeDlg(); });
 renderBM();
+document.getElementById('addBmBtn').addEventListener('click', openDlg);
 
 // ========== 待办 ==========
 function renderTodos() {
