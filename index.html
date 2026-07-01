@@ -438,28 +438,6 @@
     color: rgba(255,255,255,0.8);
     background: rgba(255,255,255,0.12);
   }
-  .wp-reset {
-    position: fixed;
-    top: 1rem;
-    right: 3rem;
-    z-index: 10;
-    padding: 0.3rem 0.7rem;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.15);
-    background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.35);
-    cursor: pointer;
-    font-size: 0.72rem;
-    font-family: inherit;
-    backdrop-filter: blur(8px);
-    transition: all 0.2s;
-    display: none;
-  }
-  .wp-reset.show { display: block; }
-  .wp-reset:hover {
-    border-color: rgba(255,255,255,0.4);
-    color: rgba(255,255,255,0.8);
-  }
   #wpInput { display: none; }
 
   @media (max-width: 600px) {
@@ -473,7 +451,6 @@
 <body>
 
 <button class="wp-btn" id="wpBtn" title="更换壁纸">&#x1F5BC;</button>
-<button class="wp-reset" id="wpReset" title="恢复默认壁纸">恢复默认</button>
 <input type="file" id="wpInput" accept="image/*">
 
 <div class="main">
@@ -628,40 +605,23 @@ si.addEventListener('keydown', e => { if (e.key==='Enter') document.getElementBy
 renderEngines();
 
 // ========== 壁纸 ==========
-const body = document.body;
-const wpInput = document.getElementById('wpInput');
-const wpBtn = document.getElementById('wpBtn');
-const wpReset = document.getElementById('wpReset');
-const DEFAULT_BG = "url('ncu-gate.png')";
-
 (function loadWallpaper() {
   const saved = localStorage.getItem('hp_wallpaper');
-  if (saved) {
-    body.style.backgroundImage = 'url(' + saved + ')';
-    wpReset.classList.add('show');
-  }
+  if (saved) document.body.style.backgroundImage = 'url(' + saved + ')';
 })();
 
-wpBtn.addEventListener('click', () => wpInput.click());
+document.getElementById('wpBtn').addEventListener('click', () => document.getElementById('wpInput').click());
 
-wpInput.addEventListener('change', () => {
-  const file = wpInput.files[0];
+document.getElementById('wpInput').addEventListener('change', () => {
+  const file = document.getElementById('wpInput').files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    const dataUrl = reader.result;
-    body.style.backgroundImage = 'url(' + dataUrl + ')';
-    localStorage.setItem('hp_wallpaper', dataUrl);
-    wpReset.classList.add('show');
+    document.body.style.backgroundImage = 'url(' + reader.result + ')';
+    localStorage.setItem('hp_wallpaper', reader.result);
   };
   reader.readAsDataURL(file);
-  wpInput.value = '';
-});
-
-wpReset.addEventListener('click', () => {
-  localStorage.removeItem('hp_wallpaper');
-  body.style.backgroundImage = DEFAULT_BG;
-  wpReset.classList.remove('show');
+  document.getElementById('wpInput').value = '';
 });
 
 // ========== 书签 ==========
