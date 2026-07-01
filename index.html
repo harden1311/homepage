@@ -674,9 +674,10 @@ function dbSet(key, val) {
 const wpSlider = document.getElementById('wpSlider');
 
 function updateBlur(v) {
-  const blur = (100 - v) * 0.4;
-  const fog = (100 - v) / 100 * 0.35;
-  document.body.style.setProperty('--wp-blur', blur + 'px');
+  const t = Math.pow((100 - v) / 100, 1.5);
+  const blur = t * 28;
+  const fog = t * 0.3;
+  document.body.style.setProperty('--wp-blur', blur.toFixed(1) + 'px');
   document.body.style.setProperty('--wp-fog', fog.toFixed(3));
 }
 
