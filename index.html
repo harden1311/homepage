@@ -110,6 +110,9 @@
   .card-row .card {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    height: 420px;
   }
   .card {
     width: 100%;
@@ -196,6 +199,9 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     color: rgba(255,255,255,0.55);
+    margin-bottom: 1rem;
+  }
+  .card-header .section-title {
     margin-bottom: 0;
   }
   .add-bm-btn {
@@ -204,26 +210,46 @@
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.2);
     background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.5);
     cursor: pointer;
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative;
     transition: all 0.2s;
-    font-family: inherit;
-    line-height: 1;
     padding: 0;
+  }
+  .add-bm-btn::before,
+  .add-bm-btn::after {
+    content: '';
+    position: absolute;
+    background: rgba(255,255,255,0.5);
+    border-radius: 1px;
+  }
+  .add-bm-btn::before {
+    width: 10px;
+    height: 2px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .add-bm-btn::after {
+    width: 2px;
+    height: 10px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
   }
   .add-bm-btn:hover {
     border-color: rgba(255,255,255,0.5);
-    color: #fff;
     background: rgba(255,255,255,0.12);
+  }
+  .add-bm-btn:hover::before,
+  .add-bm-btn:hover::after {
+    background: #fff;
   }
   .bookmarks-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     gap: 0.6rem;
+    overflow-y: auto;
+    flex: 1;
+    align-content: start;
+    padding-right: 2px;
   }
   .bm {
     display: flex;
@@ -337,7 +363,11 @@
   }
   .todo-input-row button:hover { background: rgba(255,255,255,0.25); }
 
-  .todo-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+  .todo-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; overflow-y: auto; flex: 1; }
+  .todo-list::-webkit-scrollbar { width: 4px; }
+  .todo-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+  .bookmarks-grid::-webkit-scrollbar { width: 4px; }
+  .bookmarks-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
   .todo-list li {
     display: flex;
     align-items: center;
@@ -549,9 +579,11 @@
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
-    max-height: 200px;
     overflow-y: auto;
+    flex: 1;
   }
+  .lap-list::-webkit-scrollbar { width: 4px; }
+  .lap-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
   .lap-list li {
     display: flex;
     justify-content: space-between;
@@ -601,7 +633,7 @@
     <div class="card" id="bmCard">
       <div class="card-header">
         <div class="section-title">常用网站</div>
-        <button class="add-bm-btn" id="addBmBtn" title="添加网站">+</button>
+        <button class="add-bm-btn" id="addBmBtn" title="添加网站"></button>
       </div>
       <div class="bookmarks-grid" id="bmGrid"></div>
     </div>
