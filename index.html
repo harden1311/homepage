@@ -610,7 +610,7 @@ renderEngines();
 // ========== 壁纸 ==========
 (function loadWallpaper() {
   const saved = localStorage.getItem('hp_wallpaper');
-  if (saved) document.body.style.backgroundImage = 'url(' + saved + ')';
+  if (saved) document.body.style.setProperty('background-image', 'url(' + saved + ')', 'important');
 })();
 
 document.getElementById('wpBtn').addEventListener('click', () => document.getElementById('wpInput').click());
@@ -620,7 +620,8 @@ document.getElementById('wpInput').addEventListener('change', () => {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    document.body.style.backgroundImage = 'url(' + reader.result + ')';
+    const val = 'url(' + reader.result + ')';
+    document.body.style.setProperty('background-image', val, 'important');
     localStorage.setItem('hp_wallpaper', reader.result);
   };
   reader.readAsDataURL(file);
