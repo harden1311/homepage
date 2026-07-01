@@ -484,9 +484,11 @@
     .card { padding: 1rem; }
     .card-row { flex-direction: column; }
   }
+  html.custom-bg body { background-image: none; }
 </style>
 </head>
 <body>
+<script>if(localStorage.getItem('hp_wp_custom'))document.documentElement.className='custom-bg';</script>
 
 <div class="wp-bar">
   <button class="wp-btn" id="wpBtn" title="更换壁纸">&#x1F5BC;</button>
@@ -708,6 +710,7 @@ document.getElementById('wpInput').addEventListener('change', async () => {
   reader.onload = async () => {
     const val = 'url(' + reader.result + ')';
     document.body.style.setProperty('background-image', val, 'important');
+    localStorage.setItem('hp_wp_custom', '1');
     await dbSet('wallpaper', reader.result);
   };
   reader.readAsDataURL(file);
