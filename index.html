@@ -106,14 +106,10 @@
     width: 100%;
     display: flex;
     gap: 1.5rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
   }
   .card-row .card {
-    flex: 0 0 300px;
-    min-width: 280px;
-    scroll-snap-align: start;
+    flex: 1;
+    min-width: 0;
   }
   .card {
     width: 100%;
@@ -514,6 +510,8 @@
   .t-lap:hover { background: rgba(96,165,250,0.15); }
   .t-stop { border-color: rgba(251,113,133,0.4); color: #fb7185; }
   .t-stop:hover { background: rgba(251,113,133,0.15); }
+  .t-reset { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.5); }
+  .t-reset:hover { background: rgba(255,255,255,0.1); color: #fff; }
   .lap-list {
     list-style: none;
     margin-top: 0.75rem;
@@ -590,6 +588,7 @@
         <button class="t-btn t-start" id="tStart">开始</button>
         <button class="t-btn t-lap" id="tLap">记次</button>
         <button class="t-btn t-stop" id="tStop">停止</button>
+        <button class="t-btn t-reset" id="tReset">清零</button>
       </div>
       <ul class="lap-list" id="lapList"></ul>
     </div>
@@ -977,6 +976,21 @@ tStop.addEventListener('click', () => {
   timerElapsed += Date.now() - timerStart;
   clearInterval(timerInterval);
   updateDisplay();
+  tStart.textContent = '开始';
+  tStart.disabled = false;
+  tLap.disabled = true;
+  tStop.disabled = true;
+});
+
+document.getElementById('tReset').addEventListener('click', () => {
+  if (timerRunning) {
+    timerRunning = false;
+    clearInterval(timerInterval);
+  }
+  timerElapsed = 0;
+  laps = [];
+  timerDisplay.textContent = '00:00:00.0';
+  renderLaps();
   tStart.textContent = '开始';
   tStart.disabled = false;
   tLap.disabled = true;
