@@ -48,10 +48,9 @@
     content: '';
     position: fixed;
     inset: 0;
-    background: linear-gradient(135deg, rgba(30,58,95,0.4) 0%, rgba(30,58,95,0.15) 100%);
+    background: rgba(10, 15, 25, var(--wp-overlay, 0.35));
     z-index: 0;
-    opacity: calc(1 - var(--wp-alpha, 0.65));
-    transition: opacity 0.15s;
+    transition: opacity 0.1s;
   }
 
   .main {
@@ -677,7 +676,7 @@ const wpSlider = document.getElementById('wpSlider');
 (function loadOpacity() {
   const v = localStorage.getItem('hp_wp_opacity');
   if (v !== null) wpSlider.value = v;
-  document.body.style.setProperty('--wp-alpha', wpSlider.value / 100);
+  document.body.style.setProperty('--wp-overlay', 1 - wpSlider.value / 100);
 })();
 
 // 加载壁纸
@@ -688,7 +687,7 @@ const wpSlider = document.getElementById('wpSlider');
 
 // 滑块实时调整透明度
 wpSlider.addEventListener('input', () => {
-  document.body.style.setProperty('--wp-alpha', wpSlider.value / 100);
+  document.body.style.setProperty('--wp-overlay', 1 - wpSlider.value / 100);
   localStorage.setItem('hp_wp_opacity', wpSlider.value);
 });
 
