@@ -48,9 +48,10 @@
     content: '';
     position: fixed;
     inset: 0;
-    background: rgba(10, 15, 25, var(--wp-overlay, 0.35));
     z-index: 0;
-    transition: opacity 0.1s;
+    backdrop-filter: blur(var(--wp-blur, 14px));
+    -webkit-backdrop-filter: blur(var(--wp-blur, 14px));
+    background: rgba(255,255,255, var(--wp-fog, 0.06));
   }
 
   .main {
@@ -672,11 +673,18 @@ function dbSet(key, val) {
 
 const wpSlider = document.getElementById('wpSlider');
 
+function updateBlur(v) {
+  const blur = (100 - v) * 0.4;
+  const fog = (100 - v) / 100 * 0.35;
+  document.body.style.setProperty('--wp-blur', blur + 'px');
+  document.body.style.setProperty('--wp-fog', fog.toFixed(3));
+}
+
 // 加载透明度
 (function loadOpacity() {
   const v = localStorage.getItem('hp_wp_opacity');
   if (v !== null) wpSlider.value = v;
-  document.body.style.setProperty('--wp-overlay', 1 - wpSlider.value / 100);
+  updateBlur(wpSlider.value);
 })();
 
 // 加载壁纸
@@ -685,9 +693,9 @@ const wpSlider = document.getElementById('wpSlider');
   if (saved) document.body.style.setProperty('background-image', 'url(' + saved + ')', 'important');
 })();
 
-// 滑块实时调整透明度
+// 滑块实时调整雾化
 wpSlider.addEventListener('input', () => {
-  document.body.style.setProperty('--wp-overlay', 1 - wpSlider.value / 100);
+  updateBlur(wpSlider.value);
   localStorage.setItem('hp_wp_opacity', wpSlider.value);
 });
 
