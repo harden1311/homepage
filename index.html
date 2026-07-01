@@ -477,6 +477,61 @@
   }
   #wpInput { display: none; }
 
+  /* ---- 计时器 ---- */
+  .timer-display {
+    font-size: 2.5rem;
+    font-weight: 200;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.9);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 0.75rem;
+  }
+  .timer-btns {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+  .t-btn {
+    padding: 0.45rem 1.2rem;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .t-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+  .t-start { border-color: rgba(74,222,128,0.4); color: #4ade80; }
+  .t-start:hover { background: rgba(74,222,128,0.15); }
+  .t-lap { border-color: rgba(96,165,250,0.4); color: #60a5fa; }
+  .t-lap:hover { background: rgba(96,165,250,0.15); }
+  .t-stop { border-color: rgba(251,113,133,0.4); color: #fb7185; }
+  .t-stop:hover { background: rgba(251,113,133,0.15); }
+  .lap-list {
+    list-style: none;
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .lap-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.35rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+    font-variant-numeric: tabular-nums;
+  }
+  .lap-list li:nth-child(odd) { background: rgba(255,255,255,0.03); }
+  .lap-list .lap-idx { color: rgba(255,255,255,0.3); }
+  .lap-list .lap-time { color: rgba(255,255,255,0.75); }
+
   @media (max-width: 600px) {
     body { padding: 1rem; }
     .time-block .clock { font-size: 2.5rem; letter-spacing: 3px; }
@@ -523,6 +578,20 @@
     </div>
     <ul class="todo-list" id="todoList"></ul>
   </div>
+  </div>
+</div>
+
+  <div class="card-row">
+    <div class="card" id="timerCard">
+      <div class="section-title">计时器</div>
+      <div class="timer-display" id="timerDisplay">00:00:00.0</div>
+      <div class="timer-btns">
+        <button class="t-btn t-start" id="tStart">开始</button>
+        <button class="t-btn t-lap" id="tLap">记次</button>
+        <button class="t-btn t-stop" id="tStop">停止</button>
+      </div>
+      <ul class="lap-list" id="lapList"></ul>
+    </div>
   </div>
 </div>
 
@@ -853,6 +922,68 @@ function addTodo() {
 document.getElementById('todoAdd').addEventListener('click', addTodo);
 document.getElementById('todoInput').addEventListener('keydown', e => { if (e.key==='Enter') addTodo(); });
 renderTodos();
+
+// ========== 计时器 ==========
+const timerDisplay = document.getElementById('timerDisplay');
+const tStart = document.getElementById('tStart');
+const tLap = document.getElementById('tLap');
+const tStop = document.getElementById('tStop');
+const lapList = document.getElementById('lapList');
+let laps = [];
+let timerRunning = false;
+let timerStart = 0;
+let timerElapsed = 0;
+let timerInterval = null;
+
+function fmtTime(ms) {
+  const m = Math.floor(ms / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  const d = Math.floor((ms % 1000) / 100);
+  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0') + '.' + d;
+}
+
+function updateDisplay() {
+  timerDisplay.textContent = fmtTime(timerElapsed + (timerRunning ? Date.now() - timerStart : 0));
+}
+
+function renderLaps() {
+  lapList.innerHTML = laps.map((t, i) =>
+    '<li><span class="lap-idx">#' + (i + 1) + '</span><span class="lap-time">' + fmtTime(t) + '</span></li>'
+  ).reverse().join('');
+}
+
+tStart.addEventListener('click', () => {
+  if (timerRunning) return;
+  timerRunning = true;
+  timerStart = Date.now();
+  tStart.textContent = '计时中';
+  tStart.disabled = true;
+  tLap.disabled = false;
+  tStop.disabled = false;
+  timerInterval = setInterval(updateDisplay, 100);
+});
+
+tLap.addEventListener('click', () => {
+  if (!timerRunning) return;
+  const now = timerElapsed + (Date.now() - timerStart);
+  laps.push(now);
+  renderLaps();
+});
+
+tStop.addEventListener('click', () => {
+  if (!timerRunning) return;
+  timerRunning = false;
+  timerElapsed += Date.now() - timerStart;
+  clearInterval(timerInterval);
+  updateDisplay();
+  tStart.textContent = '开始';
+  tStart.disabled = false;
+  tLap.disabled = true;
+  tStop.disabled = true;
+});
+
+tLap.disabled = true;
+tStop.disabled = true;
 </script>
 </body>
 </html>
